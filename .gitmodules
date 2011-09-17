@@ -1,0 +1,9 @@
+[submodule "submodules/vexflow"]
+	path = submodules/vexflow
+	url = https://github.com/0xfe/vexflow.git
+[submodule "submodules/closure-library"]
+	path = submodules/closure-library
+	url = ssh://git@simplestation.com:2222/closure_library.git
+[submodule "submodules/closure-compiler"]
+	path = submodules/closure-compiler
+	url = ssh://git@simplestation.com:2222/closure_compiler.git
