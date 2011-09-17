@@ -1,0 +1,29 @@
+<html>
+<head>
+{% block head -%}
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>{% block title %}{% endblock %}</title>
+	{%- for src, media_type in head_styles -%}
+		<link href="{{ src }}" media="{{ media_type }}" rel="stylesheet" type="text/css" />
+	{%- endfor -%}
+
+	{#
+	{%- if request.params.get('debug') -%}
+		<script type="text/javascript" src="{{ static_url('/scripts/goog/base.js') }}"></script>
+		<script type="text/javascript" src="{{ static_url('/scripts/mcore/deps.js') }}"></script>
+		<script type="text/javascript" src="{{ static_url('/scripts/mcore/base.js') }}"></script>
+	{%- else -%}
+		<script type="text/javascript" src="{{ static_url('/scripts/mcore-compiled.js') }}"></script>
+	{%- endif -%}
+	#}
+
+	{%- for src in head_scripts -%}
+		<script type="text/javascript" src="{{ src }}"></script>
+	{%- endfor -%}
+{%- endblock -%}
+</head>
+<body>
+	{%- block content -%}
+	{%- endblock -%}
+</body>
+</html>
