@@ -1,8 +1,21 @@
 {% extends 'layout.jinja2' %}
 
+{% set head_scripts = [
+	request.static_url('counterpoint:static/scripts/vexflow/vexflow-dbg.js')
+] %}
+
 {% block title %}{{ 'Exercise Page!' }}{% endblock %}
 
 {% block content %}
-blah
+	<canvas width=700 height=100"></canvas>
+	<script type="text/javascript">
+		var canvas = document.getElementsByTagName("canvas")[0];
+		var renderer = new Vex.Flow.Renderer(canvas,
+		Vex.Flow.Renderer.Backends.CANVAS);
+
+		var ctx = renderer.getContext();
+		var stave = new Vex.Flow.Stave(10, 0, 500);
+		stave.addClef("treble").setContext(ctx).draw();
+	</script>
 {% endblock %}
 
