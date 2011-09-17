@@ -1,0 +1,11 @@
+*.egg
+*.egg-info
+*.pyc
+*.tmproj
+.*.swp
+.DS_Store
+.cache
+.project
+.swp
+dist
+test.ini
