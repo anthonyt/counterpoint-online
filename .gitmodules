@@ -7,3 +7,9 @@
 [submodule "submodules/closure-compiler"]
 	path = submodules/closure-compiler
 	url = ssh://git@simplestation.com:2222/closure_compiler.git
+[submodule "submodules/mingus"]
+	path = submodules/mingus
+	url = git@github.com:anthonyt/mingus-counterpoint.git
+[submodule "submodules/counterpoint_lib"]
+	path = submodules/counterpoint_lib
+	url = git@github.com:anthonyt/counterpoint.git
