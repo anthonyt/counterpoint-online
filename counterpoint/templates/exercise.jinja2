@@ -13,6 +13,9 @@
 			padding: 10px;
 			border: 10px solid #ddc;
 		}
+		.hidden {
+			display: none;
+		}
 	</style>
 	<canvas width="1024" height="300"></canvas>
 	<script type="text/javascript">
@@ -75,9 +78,15 @@
 		}
 
 	</script>
+	<script type="text/javascript">
+		var toggle = function(id, className) {
+			var ul = document.getElementById(id);
+			ul.className = (ul.className == 'hidden')?'':'hidden';
+		};
+	</script>
 {% for s in ['first', 'second', 'third', 'fourth'] %}
-	<h2>{{ s }} species:</h2>
-	<ul>
+	<h2 onclick="toggle('{{s}}-errors', '{{s}}')">{{ s }} species:</h2>
+	<ul id="{{s}}-errors" class="hidden">
 		{% for e in errors[s] %}
 			<li>{{ e[0] }}<p>{{e[1]}}</p></li>
 		{% endfor %}
