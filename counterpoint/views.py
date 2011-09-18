@@ -33,8 +33,9 @@ durations = {
     16: '16',
     32: '32',
 }
+inv_durations = dict((durations[x], x) for x in durations)
 
-def mingus_to_vexflow(track):
+def mingus_track_to_vexflow(track):
     bars = []
     for bar in track:
         notes = []
@@ -50,7 +51,32 @@ def mingus_to_vexflow(track):
         bars.append(notes)
     return bars
 
-def view_exercise(context, request):
+def vexflow_to_mingus_composition(melodies):
+    # Create a composition, and add the vocal tracks to it.
+    composition = Composition()
+    composition.set_title('Counterpoint Exercise', '')
+    composition.set_author(author, '')
+
+    # Set up our vocal 'tracks' with the notes, key, meter defined in tracks.py
+    tracks = {}
+    for voice in [Soprano, Alto, Tenor, Bass]:
+        lower_name = voice.name.lower()
+        if lower_name in melodies and melodies[lower_name]:
+            tracks[voice.name] = Track(instrument=voice())
+            tracks[voice.name].add_bar(Bar(key=key, meter=meter))
+            tracks[voice.name].name = voice.name
+            for bar in melodies[lower_name]:
+                for pitch, duration in bar:
+                    pitch = pitch.replace('/', '-').upper()
+                    if duration.endswith('r'):
+                        pitch = None
+                        duration = duration[:-1]
+                    duration = inv_durations[duration]
+                    tracks[voice.name].add_notes(pitch, duration)
+            composition.add_track(tracks[voice.name])
+    return composition
+
+def tests_to_mingus_composition():
     # Create a composition, and add the vocal tracks to it.
     composition = Composition()
     composition.set_title('Counterpoint Exercise', '')
@@ -66,7 +92,16 @@ def view_exercise(context, request):
             for note in melodies[voice.name]:
                 tracks[voice.name].add_notes(*note)
             composition.add_track(tracks[voice.name])
+    return composition
 
+def mingus_composition_to_vexflow(composition):
+    notes = {}
+    for track in composition.tracks:
+        voice = track.name.lower()
+        notes[voice] = mingus_track_to_vexflow(track)
+    return notes
+
+def mingus_composition_to_errors(composition):
     errors = {}
     # Compute any errors.
     for s in species:
@@ -75,11 +110,18 @@ def view_exercise(context, request):
             (get_error_text(e), written_rules.get(e[-1], ''))
             for e in standardize_errors(error_dict)
         ]
+    return errors
 
-    notes = {}
-    for track in composition.tracks:
-        voice = track.name.lower()
-        notes[voice] = mingus_to_vexflow(track)
+def view_exercise(context, request):
+    composition = tests_to_mingus_composition()
+    errors = mingus_composition_to_errors(composition)
+    notes = mingus_composition_to_vexflow(composition)
+
+    # TEST CODE: Just make sure we can go from vexflow to mingus and back
+    # TODO: Make the front-end code submit vexflow notes in this format
+    #       so we can actually have interactive evaluation.
+    c = vexflow_to_mingus_composition(notes)
+    notes = mingus_composition_to_vexflow(c)
 
     return dict(
         errors = errors,
