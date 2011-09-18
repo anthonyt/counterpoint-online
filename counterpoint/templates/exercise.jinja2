@@ -7,15 +7,81 @@
 {% block title %}{{ 'Exercise Page!' }}{% endblock %}
 
 {% block content %}
-	<canvas width=700 height=100"></canvas>
+	<style type="text/css">
+		canvas {
+			background: #eed;
+			padding: 10px;
+			border: 10px solid #ddc;
+		}
+	</style>
+	<canvas width="1024" height="300"></canvas>
 	<script type="text/javascript">
 		var canvas = document.getElementsByTagName("canvas")[0];
 		var renderer = new Vex.Flow.Renderer(canvas,
 		Vex.Flow.Renderer.Backends.CANVAS);
 
 		var ctx = renderer.getContext();
-		var stave = new Vex.Flow.Stave(10, 0, 500);
-		stave.addClef("treble").setContext(ctx).draw();
+		var treble_staff = new Vex.Flow.Stave(10, 0, 1000);
+		var bass_staff = new Vex.Flow.Stave(10, 100, 1000);
+		treble_staff.addClef("treble");
+		treble_staff.setContext(ctx).draw();
+		bass_staff.addClef("bass");
+		bass_staff.setContext(ctx).draw();
+
+		var voice_names = ['soprano', 'alto', 'tenor', 'bass'];
+		var staves = {
+			'bass': bass_staff,
+			'treble': treble_staff
+		};
+		var voice_descriptions = {
+			'soprano': { 'staff': 'treble', 'stem_direction': 1},
+			'alto': { 'staff': 'treble', 'stem_direction': -1},
+			'tenor': { 'staff': 'bass', 'stem_direction': 1},
+			'bass': { 'staff': 'bass', 'stem_direction': -1},
+		};
+		var notes = {{ notes|safe }};
+		for (var i=0; i<voice_names.length; i++) {
+			var voice_name = voice_names[i];
+			if (notes[voice_name] == undefined) { continue; }
+			var sd = voice_descriptions[voice_name]['stem_direction'];
+			var staff = voice_descriptions[voice_name]['staff'];
+			var voice = new Vex.Flow.Voice({
+				num_beats: 4,
+				beat_value: 4,
+				resolution: Vex.Flow.RESOLUTION
+			});
+			voice.setStrict(false);
+
+			for (var j=0; j<notes[voice_name].length; j++) {
+				var voice_notes = [];
+				var bar = notes[voice_name][j];
+				for (var k=0; k<bar.length; k++) {
+					var n = bar[k][0];
+					var d = bar[k][1];
+					var opts = {keys: [n], duration: d, stem_direction: sd, clef: staff};
+					var note = new Vex.Flow.StaveNote(opts);
+					voice_notes.push(note);
+				}
+				voice_notes.push(new Vex.Flow.BarNote());
+				voice.addTickables(voice_notes);
+			}
+
+			// Format and justify the notes to 500 pixels
+			var formatter = new Vex.Flow.Formatter().
+				joinVoices([voice]).format([voice], 1024);
+
+			// Render voice
+			voice.draw(ctx, staves[staff]);
+		}
+
 	</script>
+{% for s in ['first', 'second', 'third', 'fourth'] %}
+	<h2>{{ s }} species:</h2>
+	<ul>
+		{% for e in errors[s] %}
+			<li>{{ e[0] }}<p>{{e[1]}}</p></li>
+		{% endfor %}
+	</ul>
+{% endfor %}
 {% endblock %}
 
